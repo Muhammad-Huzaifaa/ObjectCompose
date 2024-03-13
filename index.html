@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<meta property='og:title' content='ObjectCompose: Evaluating Resilience of Vision-Based Models on Object-to-Background Compositional Changes'/>
+<meta property='og:image' content=''/>
+<meta property='og:description' content=''/>
+<meta property='og:url' content='https://muhammad-huzaifaa.github.io/ObjectCompose/'/>
+<meta property='og:image:width' content='1200' />
+<meta property='og:image:height' content='663' />
+<!-- TYPE BELOW IS PROBABLY: 'website' or 'article' or look on https://ogp.me/#types -->
+<meta property="og:type" content='website'/>
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-257CHSRQ00"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-257CHSRQ00');
+</script>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Evaluating Resilience of Vision-Based Models on Object-to-Background Compositional Changess">
+  <meta name="keywords" content="Robustness, Adversarial, CLIP, Foundation Models">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Evaluating Resilience of Vision-Based Models on Object-to-Background Compositional Changes</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/tab_gallery.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+  <link rel="stylesheet" href="juxtapose/css/juxtapose.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+  <script src="./static/js/magnifier.js"></script>
+  <link href="https://fonts.cdnfonts.com/css/menlo" rel="stylesheet">
+  <link rel="stylesheet" href="./static/css/image_card_fader.css">
+  <link rel="stylesheet" href="./static/css/image_card_slider.css">
+
+</head>
+
+<style>
+  @import url('https://fonts.cdnfonts.com/css/menlo');
+</style>
+
+
+<body>
+  <section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-2 publication-title">Evaluating Resilience of
+            Vision-Based Models on Object-to-Background
+            Compositional Changes</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=2Ft7r4AAAAAJ&hl=en">Hashmat Shadab Malik*</a><sup> 1</sup>,</span>
+            <span class="author-block">
+              <a href="https://muhammad-huzaifaa.github.io/">Muhammad Huzaifa*</a><sup> 1</sup>,</span>
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=tM9xKA8AAAAJ&hl=en&oi=ao">Muzammal Naseer</a><sup>1</sup>,
+            </span>
+              <br>
+            <span class="author-block">
+              <a href="https://scholar.google.com.pk/citations?user=M59O9lkAAAAJ&hl=en">Salman Khan</a><sup>1,2</sup>,
+            </span>
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=zvaeYnUAAAAJ&hl=en">Fahad Shahbaz Khan </a><sup>1, 3</sup>
+            </span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup>Mohamed bin Zayed University of AI,</span>
+            <span class="author-block"><sup>2</sup> Australian National University,</span>
+            <span class="author-block"><sup>3</sup>Linköping University</span>
+          </div>
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2403.04701"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://github.com/Muhammad-Huzaifaa/ObjectCompose"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+              <span class="link-block">
+                <a href="https://drive.google.com/drive/folders/1I2ieLg5b8jEjrDHBeiwlPqsU_XRgb2Hh?usp=sharing"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Dataset</span>
+                  </a>
+              </span>
+
+              <span class="link-block">
+                <a href="#bibtex"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-obp"></i>
+                  </span>
+                  <span>BibTex</span>
+                </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+<img src="./static/images/intro.jpg" >
+      <h2 class="subtitle has-text-centered">
+<p align="justify"> The image-to-background variations by our approach. Each column in the
+  figure represents a specific background generated through the corresponding prompt
+  mentioned below of each image.  </p>
+      </h2>
+    </div>
+  </div>
+</section>
+
+<section class="hero is-light is-small">
+  <div class="hero-body">
+    <div class="container is-max-desktop has-text-centered">
+                 <!-- Visual Effects. -->
+      <div class="column">
+        <div style="text-align:center;" >
+
+<!-- <iframe width="560" height="315" src="https://www.youtube.com/embed/HecFYi-WpFI?si=JcvS-YKp1kZpiil1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> --> 
+
+        </div>
+      </div>
+      <h2 class="title is-3">Abstract</h2>
+      <div class="container is-max-desktop">
+        <p>
+          Given the large-scale multi-modal training of recent visionbased models and their generalization capabilities, understanding the extent of their robustness is critical for their real-world deployment. In this
+          work, our goal is to evaluate the resilience of current vision-based models against diverse object-to-background context variations. The majority
+          of robustness evaluation methods have introduced synthetic datasets to
+          induce changes to object characteristics (viewpoints, scale, color) or utilized image transformation techniques (adversarial changes, common corruptions) on real images to simulate shifts in distributions. Recent works
+          have explored leveraging large language models and diffusion models to
+          generate changes in the background. However, these methods either lack
+          in offering control over the changes to be made or distort the object
+          semantics, making them unsuitable for the task. Our method, on the
+          other hand, can induce diverse object-to-background changes while preserving the original semantics and appearance of the object. To achieve
+          this goal, we harness the generative capabilities of text-to-image, imageto-text, and image-to-segment models to automatically generate a broad
+          spectrum of object-to-background changes. We induce both natural and
+          adversarial background changes by either modifying the textual prompts
+          or optimizing the latents and textual embedding of text-to-image models. This allows us to quantify the role of background context in understanding the robustness and generalization of deep neural networks. We
+          produce various versions of standard vision datasets (ImageNet, COCO),
+          incorporating either diverse and realistic backgrounds into the images or
+          introducing color, texture, and adversarial changes in the background.
+          We conduct thorough experimentation and provide an in-depth analysis
+          of the robustness of vision-based models against object-to-background
+          context variations across different tasks.   <br>
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+
+</section>
+
+
+
+
+
+
+<section class="section">
+  
+    <!--/ Matting. -->
+    <div class="container is-max-desktop">
+    
+    <!-- Latent space editing applications -->
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3 has-text-centered">ObjectCompose Framework</h2>
+
+
+        
+        <div class="content has-text-centered">
+            <img src="./static/images/concept-001.jpg">
+        </div>
+        <div class="content has-text-justified">
+          <p>
+            <b>Overview of ObjectCompose framework.</b>  ObjectCompose consists of an inpainting-based diffusion model to generate the counterfactual background of an image. The object mask is obtained from a
+            segmentation model (SAM) by providing the class label as an input prompt. The segmentation mask, along with the original image caption (generated via BLIP-2) is then
+            processed through the diffusion model. For generating adversarial examples, both the
+            latent and conditional embedding are optimized during the denoising process.
+          </p>
+        </div>
+
+      </div>
+    </div>
+ <!-- Row of GIFs -->
+ <div class="columns is-centered">
+  <div class="column is-full-width">
+      <h2 class="title is-3 has-text-centered">ObjectCompose: Achieving Diversity via Text Prompts. </h2>
+      <div class="columns">
+          <div class="column">
+              <img src="static/images/output.gif" alt="GIF 1">
+          </div>
+          <div class="column">
+              <img src="static/images/output2.gif" alt="GIF 2">
+          </div>
+          <div class="column">
+              <img src="static/images/output3.gif" alt="GIF 3">
+          </div>
+          <div class="column">
+              <img src="static/images/output4.gif" alt="GIF 4">
+          </div>
+          <div class="column">
+              <img src="static/images/output5.gif" alt="GIF 5">
+          </div>
+      </div>
+  </div>
+</div>
+</div>
+
+    <section class="section">
+      <div class="container is-max-desktop">
+        <!-- Abstract. -->
+        <div class="columns is-centered has-text-centered">
+          <div class="column is-four-fifths">
+            <h2 class="title is-3">ObjectCompose: Automating diverse background changes in real images.
+            </h2>
+            <div class="content has-text-justified">
+              <p>
+              <h5> <b> Our Insights : </b></h5>
+               <ol>
+                 <li> <b>Robustness of Vision Models: </b> Vison-based models are vulnerable to diverse background changes, such as texture and color, with the most prone to adversarial background changes.</li>
+      <li><b>Model Capacity: </b> Increasing the capacity of the model for both CNN and transformer-based models helps in improving the robustness against varying background contexts. This indicates, that distilling from a more robust model can help in improving the robustness of small models.  Evidence of this is seen in the performance of DeiT-T, which, by distilling knowledge from a strong CNN-based model, shows improved robustness as compared to ViT-T</li>
+      <li><b>Adversarially Trained Models:  </b>Our study indicates that adversarially trained models have limited robustness. While they perform well in scenarios with adversarial background changes, their effectiveness is limited for other types of object-to-background compositions. This highlights a significant gap in current model training approaches when it comes to dealing with diverse background changes.</li>
+      <li><b>Evaluation across various Vision Task:  </b>Object detection and segmentation models, which incorporate object-to-background context, display reasonably better robustness to background changes than classification models, as evidenced by quantitative and qualitative results</li>
+      <li><b>Robustness of Dinov2 Models:  </b>Also, recent training approaches for vision transformer-based classification models that learn more interpretable attention maps like Dinov2 (with registers) show improvement in robustness to background changes </li>
+      <li><b>Large Scale Training:  </b>Furthermore, models trained on large-scale datasets with more scalable and stable training show better robustness against background variations.</li>
+    </ol>
+              </p>
+            </div>
+          </div>
+        </div>
+        <!--/ Abstract. -->
+    
+      </div>
+    </section>
+
+
+
+    <div class="columns is-centered">
+      <div class="container is-max-desktop">
+        <h2 class="title is-3">ObjectCompose results comparison</h2>
+
+        <div class="content has-text-justified">
+          <p>
+            Our natural object-to-background changes, including color and texture, perform favorably against state-of-the-art methods. Furthermore, our adversarial object-to-background changes show a significant drop in performance across vision models
+          </p>
+        </div>
+                <h3 class="title is-4 has-text-justified">ObjectCompose performs favourably well relative to SOTA methods across unimodel models</h3>
+        <div class="content has-text-centered">
+<center>
+<table  border="0">
+<tbody>
+<tr>
+<td> <b>Dataset</b>   </td>
+<td><center> <b>ViT-T</b>  </center>   </td>
+<td><center> <b>ViT-S</b>  </center>   </td>
+<td><center> <b>Swin-T</b>  </center>   </td>
+<td><center> <b>Swin-S</b>  </center>   </td>
+<td><center> <b>Res-50</b>  </center>   </td>
+<td><center> <b>Res-152</b>  </center>   </td>
+<td><center> <b>Dense-161</b>  </center>   </td>
+<td><center> <b>Average</b>  </center>   </td>
+
+</tr>
+<tr>
+  <td><a>Original</a></td>
+<td><center>95.5</center> </td>
+<td><center>97.5</center> </td>
+<td><center>97.9</center> </td>
+<td><center>98.3</center> </td>
+<td><center>98.5</center> </td>
+<td><center>99.1</center> </td>
+<td><center>97.2</center> </td>
+<td><center>97.1</center> </td>
+
+</tr>
+<tr>
+<td><a href="https://arxiv.org/abs/2303.17096">ImageNet-E(λ=-20)</a></td>
+<td><center>91.3</center> </td>
+<td><center>94.5</center> </td>
+<td><center>96.5</center> </td>
+<td><center>97.7</center> </td>
+<td><center>96.0</center> </td>
+<td><center>97.6</center> </td>
+<td><center>95.4</center> </td>
+<td><center>95.5</center> </td>
+</tr>
+<tr>
+  <td><a href="https://arxiv.org/abs/2303.17096">ImageNet-E(λ=20)</a></td>
+  <td><center>90.4</center> </td>
+  <td><center>94.5</center> </td>
+  <td><center>95.9</center> </td>
+  <td><center>97.4</center> </td>
+  <td><center>95.4</center> </td>
+  <td><center>97.4</center> </td>
+  <td><center>95.0</center> </td>
+  <td><center>95.1</center> </td>
+
+</tr>
+<tr>
+  <td><a href="https://arxiv.org/abs/2303.17096">ImageNet-E(λ=20-adv)</a></td>
+  <td><center>82.8</center> </td>
+  <td><center>88.8</center> </td>
+  <td><center>90.7</center> </td>
+  <td><center>92.8</center> </td>
+  <td><center>91.6</center> </td>
+  <td><center>94.2</center> </td>
+  <td><center>90.4</center> </td>
+  <td><center>90.21</center> </td>
+
+</tr>
+<tr>
+  <td><a href="https://arxiv.org/abs/2305.19164">LANCE</a></td>
+  <td><center>80.0</center> </td>
+  <td><center>83.8</center> </td>
+  <td><center>87.6</center> </td>
+  <td><center>87.7</center> </td>
+  <td><center>86.1</center> </td>
+  <td><center>87.4</center> </td>
+  <td><center>85.1</center> </td>
+  <td><center>85.3</center> </td>
+
+</tr>
+<tr>
+  <td><a style="color:black;"></a>Class label(ours)</a></td>
+  <td><center>90.5</center> </td>
+  <td><center>94.0</center> </td>
+  <td><center>95.1</center> </td>
+  <td><center>95.4</center> </td>
+  <td><center>96.7</center> </td>
+  <td><center>96.5</center> </td>
+  <td><center>94.7</center> </td>
+  <td><center>94.7</center> </td>
+
+</tr>
+<tr>
+  <td><a style="color:black;"></a>BLIP-2 Caption(ours)</a></td>
+  <td><center>85.5</center> </td>
+  <td><center>89.1</center> </td>
+  <td><center>91.9</center> </td>
+  <td><center>92.1</center> </td>
+  <td><center>93.9</center> </td>
+  <td><center>94.5</center> </td>
+  <td><center>90.6</center> </td>
+  <td><center>91.0</center> </td>
+
+</tr>
+<tr>
+  <td><a style="color:black;"></a>Color(ours)</a></td>
+  <td><center>67.1</center> </td>
+  <td><center>83.8</center> </td>
+  <td><center>85.8</center> </td>
+  <td><center>86.1</center> </td>
+  <td><center>88.2</center> </td>
+  <td><center>91.7</center> </td>
+  <td><center>80.9</center> </td>
+  <td><b style="color:black;"> <center>83.37 </b></center>  </td>
+
+</tr>
+<tr>
+  <td><a style="color:black;"></a>Texture(ours)</a></td>
+  <td><center>64.7</center> </td>
+  <td><center>80.4</center> </td>
+  <td><center>84.1</center> </td>
+  <td><center>85.8</center> </td>
+  <td><center>85.5</center> </td>
+  <td><center>90.1</center> </td>
+  <td><center>80.3</center> </td>
+  <td><b style="color:black;"> <center>81.55 </b></center>  </td>
+
+</tr><tr>
+  <td><a style="color:black;"></a>Adversarial(ours)</a></td>
+  <td><center>18.4</center> </td>
+  <td><center>32.1</center> </td>
+  <td><center>25.0</center> </td>
+  <td><center>31.7</center> </td>
+  <td><center>2.0</center> </td>
+  <td><center>14.0</center> </td>
+  <td><center>28.0</center> </td>
+  <td><b style="color:black;"> <center>21.65 </b></center>  </td>
+
+</tr>
+
+
+</tbody>
+</table>
+</center>
+
+<br/>
+        </div>
+                <div class="content has-text-justified">
+          <p> We evaluated the resilience of Zero-shot CLIP models against object-to-background compositional changes. </p>
+                   </p>
+                 <h3 class="title is-4 has-text-justified">ObjectCompose fares well in comparison with state of the art methods when evaluated on multimodel models (CLIP).</h3>
+
+                  <p align="justify"> </p>
+                  <center>
+                    <table  border="0">
+                    <tbody>
+                    <tr>
+                    <td> <b>Dataset</b>   </td>
+                    <td><center> <b>ViT-B/32</b>  </center>   </td>
+                    <td><center> <b>ViT-B/16</b>  </center>   </td>
+                    <td><center> <b>ViT-L/14</b>  </center>   </td>
+                    <td><center> <b>Res50</b>  </center>   </td>
+                    <td><center> <b>Res101</b>  </center>   </td>
+                    <td><center> <b>Res50x4</b>  </center>   </td>
+                    <td><center> <b>Res50x16</b>  </center>   </td>
+                    <td><center> <b>Average</b>  </center>   </td>
+                    
+                    </tr>
+                    <tr>
+                      <td><a>Original</a></td>
+                    <td><center>73.9</center> </td>
+                    <td><center>79.4</center> </td>
+                    <td><center>87.7</center> </td>
+                    <td><center>70.6</center> </td>
+                    <td><center>71.8</center> </td>
+                    <td><center>76.2</center> </td>
+                    <td><center>82.1</center> </td>
+                    <td><center>77.4</center> </td>
+                    
+                    </tr>
+                    <tr>
+                    <td><a href="https://arxiv.org/abs/2303.17096">ImageNet-E(λ=-20)</a></td>
+                    <td><center>69.7</center> </td>
+                    <td><center>76.7</center> </td>
+                    <td><center>82.8</center> </td>
+                    <td><center>67.8</center> </td>
+                    <td><center>69.9</center> </td>
+                    <td><center>72.7</center> </td>
+                    <td><center>77.0</center> </td>
+                    <td><center>73.8</center> </td>
+                    </tr>
+                    <tr>
+                      <td><a href="https://arxiv.org/abs/2303.17096">ImageNet-E(λ=20)</a></td>
+                      <td><center>67.9</center> </td>
+                      <td><center>76.1</center> </td>
+                      <td><center>82.1</center> </td>
+                      <td><center>67.3</center> </td>
+                      <td><center>69.8</center> </td>
+                      <td><center>72.6</center> </td>
+                      <td><center>77.0</center> </td>
+                      <td><center>73.3</center> </td>
+                    
+                    </tr>
+                    <tr>
+                      <td><a href="https://arxiv.org/abs/2303.17096">ImageNet-E(λ=20-adv)</a></td>
+                      <td><center>62.8</center> </td>
+                      <td><center>70.5</center> </td>
+                      <td><center>77.5</center> </td>
+                      <td><center>59.9</center> </td>
+                      <td><center>65.8</center> </td>
+                      <td><center>67.0</center> </td>
+                      <td><center>67.0</center> </td>
+                      <td><center>68.2</center> </td>
+                    
+                    </tr>
+                    <tr>
+                      <td><a href="https://arxiv.org/abs/2305.19164">LANCE</a></td>
+                      <td><center>54.9</center> </td>
+                      <td><center>54.1</center> </td>
+                      <td><center>57.4</center> </td>
+                      <td><center>58.0</center> </td>
+                      <td><center>60.0</center> </td>
+                      <td><center>60.3</center> </td>
+                      <td><center>73.3</center> </td>
+                      <td><center>59.7</center> </td>
+                    
+                    </tr>
+                    <tr>
+                      <td><a style="color:black;"></a>Class label(ours)</a></td>
+                      <td><center>78.4</center> </td>
+                      <td><center>83.6</center> </td>
+                      <td><center>81.5</center> </td>
+                      <td><center>76.6</center> </td>
+                      <td><center>77.0</center> </td>
+                      <td><center>82.0</center> </td>
+                      <td><center>84.5</center> </td>
+                      <td><center>80.5</center> </td>
+                    
+                    </tr>
+                    <tr>
+                      <td><a style="color:black;"></a>BLIP-2 Caption(ours)</a></td>
+                      <td><center>68.7</center> </td>
+                      <td><center>72.2</center> </td>
+                      <td><center>71.4</center> </td>
+                      <td><center>65.2</center> </td>
+                      <td><center>68.4</center> </td>
+                      <td><center>71.2</center> </td>
+                      <td><center>75.4</center> </td>
+                      <td><center>70.4</center> </td>
+                    
+                    </tr>
+                    <tr>
+                      <td><a style="color:black;"></a>Color(ours)</a></td>
+                      <td><center>48.3</center> </td>
+                      <td><center>61.0</center> </td>
+                      <td><center>69.5</center> </td>
+                      <td><center>50.5</center> </td>
+                      <td><center>54.8</center> </td>
+                      <td><center>60.3</center> </td>
+                      <td><center>69.2</center> </td>
+                      <td><b style="color:black;"> <center>59.1 </b></center>  </td>
+                    
+                    </tr>
+                    <tr>
+                      <td><a style="color:black;"></a>Texture(ours)</a></td>
+                      <td><center>49.6</center> </td>
+                      <td><center>62.4</center> </td>
+                      <td><center>58.8</center> </td>
+                      <td><center>51.6</center> </td>
+                      <td><center>53.2</center> </td>
+                      <td><center>60.7</center> </td>
+                      <td><center>67.4</center> </td>
+                      <td><b style="color:black;"> <center>57.7 </b></center>  </td>
+                    
+                    </tr><tr>
+                      <td><a style="color:black;"></a>Adversarial(ours)</a></td>
+                      <td><center>25.5</center> </td>
+                      <td><center>34.8</center> </td>
+                      <td><center>48.1</center> </td>
+                      <td><center>18.2</center> </td>
+                      <td><center>24.4</center> </td>
+                      <td><center>30.2</center> </td>
+                      <td><center>48.4</center> </td>
+                      <td><b style="color:black;"> <center>32.8 </b></center>  </td>
+                    
+                    </tr>
+                    
+                    
+                    </tbody>
+                    </table>
+                    </center>
+
+<br/>
+        </div>
+
+        <!-- <br>
+        <h3 class="title is-4 has-text-justified">ProText performs favourably well in Cross-dataset benchmark</h3>
+        <div class="content has-text-justified">
+          <p>
+ProText with text-only training improves over CLIP, CuPL, and prior 16-shot image-supervised methods in challenging cross-dataset transfer settings. Prompt ensembling based CuPL performs same as CLIP as it cannot transfer class specific LLM templates to cross-datasets.          </p>
+        </div> 
+         <div class="content has-text-centered">
+<center>
+<table  border="0">
+<tbody>
+<tr>
+<td> <b>Method</b>   </td>
+<td><center> <b>Supervision Type</b>  </center>   </td>
+<td><center> <b>Avg. Accuracy</b>  </center>   </td>
+</tr>
+<tr>
+  <td><a href="https://arxiv.org/abs/2109.01134">CoOP [1]</a></td>
+<td><center>labeled images</center> </td>
+<td><center>63.88</center> </td>
+</tr>
+<tr>
+<td><a href="https://arxiv.org/abs/2203.05557">CoCoOp [2]</a></td>
+<td> <center> labeled images</center> </td>
+<td> <center>65.74  </center> </td>
+</tr>
+<tr>
+<td><a href="https://arxiv.org/abs/2210.03117">MaPLe [3]</a></td>
+<td> <center>labeled images  </center> </td>
+<td> <center>66.30 </center> </td>
+
+</tr>
+<tr>
+<td><a href="https://arxiv.org/abs/2307.06948">PromptSRC [4]</a></td>
+<td>  <center>labeled images </center>  </td>
+<td>  <center>65.81  </center> </td>
+</tr>
+      <tr>
+<td><a href="https://arxiv.org/abs/2103.00020">CLIP</a> / <a href="https://arxiv.org/abs/2209.03320">CuPL</a></td>
+<td> <center>Text Prompts </center>  </td>
+<td> <center>65.15 </center> </td>
+
+</tr>
+          <tr>
+<td><b style="color:black;"> ProText (ours) </b></td>
+<td> <b style="color:black;"> <center>Text Prompts </b></center>  </td>
+<td> <b style="color:black;"> <center>67.23 </b></center> </td>
+
+</tr>
+
+</tbody>
+</table>
+</center>
+
+            <p>Models are trained on ImageNet-1k data and evaluated on 10 cross-datasets.</p>
+<br/>  -->
+
+             <h3 class="title is-4 has-text-justified">Qualitative comparison</h3>
+              <div class="item item-sunflowers">
+                <img src="./static/images/qualitative.jpg" />
+              </div>
+                <div class="content has-text-justified">
+          <p>
+            Qualitative comparison of our method (top row) with previous related work
+            (bottom row). Our method enables diversity and controlled background edits.      </p>
+        </div>
+
+        <h3 class="title is-4 has-text-justified">Conclusion</h3>
+        <div class="content has-text-justified">
+          <p>
+            In this study, we propose ObjectCompose, a method for generating objectto-background compositional changes. Our method addresses the limitations of
+            current works, specifically distortion of object semantics and diversity in background changes. We accomplish this by utilizing the capabilities of image-to-text
+            and image-to-segmentation foundational models to preserve the object semantics, while we optimize for diverse object-to-background compositional changes
+            by modifying the textual prompts or optimizing the latents of the text-to-image
+            model. ObjectCompose offers a complimentary evaluation protocol to the existing ones, for comprehensive evaluations across current vision-based models
+            to reveal their vulnerability to background alterations. We anticipate that our
+            insights will pave the way for a more thorough evaluation of vision models, consequently driving the development of more effective methods for improving their
+            resilience.      </p>
+     <br><p>For additional details about ObjectCompose framework, dataset, results, please refer to our main paper. Thank you!</p>
+        </div>
+
+</section>
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title"><a id="bibtex">BibTeX</a></h2>
+    <pre><code>@article{malik2024objectcompose,
+    title={ObjectCompose: Evaluating Resilience of Vision-Based Models on Object-to-Background Compositional Changes},
+    author={Malik, Hashmat Shadab and Huzaifa, Muhammad and Muzzamal, Naseer and Khan, Salman and Khan, Fahad Shahbaz},
+    journal={arXiv:2403.04701},
+    year={2024}
+}
+</code></pre>
+  </div>
+</section>
+
+
+<footer class="footer">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+<!--          <p>-->
+<!--            This website is licensed under a <a rel="license"-->
+<!--                                                href="http://creativecommons.org/licenses/by-sa/4.0/">Creative-->
+<!--            Commons Attribution-ShareAlike 4.0 International License</a>.-->
+<!--          </p>-->
+          <p>
+            Website adapted from the following <a href="https://mingukkang.github.io/GigaGAN/">source code</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<script src="juxtapose/js/juxtapose.js"></script>
+
+<script>
+var slider;
+let origOptions = {
+    "makeResponsive": true,
+    "showLabels": true,
+    "mode": "horizontal",
+    "showCredits": true,
+    "animate": true,
+    "startingPosition": "50"
+};
+
+const juxtaposeSelector = "#juxtapose-embed";
+const transientSelector = "#juxtapose-hidden";
+
+  inputImage.src = "./static/images/".concat(name, "_input.jpg")
+  outputImage.src = "./static/images/".concat(name, "_output.jpg")
+
+  let images = [inputImage, outputImage];
+  let options = slider.options;
+  options.callback = function(obj) {
+      var newNode = document.getElementById(obj.selector.substring(1));
+      var oldNode = document.getElementById(juxtaposeSelector.substring(1));
+      console.log(obj.selector.substring(1));
+      console.log(newNode.children[0]);
+      oldNode.replaceChild(newNode.children[0], oldNode.children[0]);
+      //newNode.removeChild(newNode.children[0]);
+      
+  };
+  
+  slider = new juxtapose.JXSlider(transientSelector, images, options);
+};
+
+
+
+(function() {
+    slider = new juxtapose.JXSlider(
+        juxtaposeSelector, origImages, origOptions);
+    //document.getElementById("left-button").onclick = replaceLeft;
+    //document.getElementById("right-button").onclick = replaceRight;
+})();
+  // Get the image text
+  var imgText = document.getElementById("imgtext");
+  // Use the same src in the expanded image as the image being clicked on from the grid
+  // expandImg.src = imgs.src;
+  // Use the value of the alt attribute of the clickable image as text inside the expanded image
+  imgText.innerHTML = name;
+  // Show the container element (hidden with CSS)
+  // expandImg.parentElement.style.display = "block";
+
+$(".flip-card").click(function() {
+            console.log("fading in")
+            div_back = $(this).children().children()[1]
+            div_front = $(this).children().children()[0]
+            // console.log($(this).children("div.flip-card-back"))
+            console.log(div_back)
+            $(div_front).addClass("out");
+            $(div_front).removeClass("in");
+
+            $(div_back).addClass("in");
+            $(div_back).removeClass("out");
+
+});
+
+$(".flip-card").mouseleave(function() {
+            console.log("fading in")
+            div_back = $(this).children().children()[1]
+            div_front = $(this).children().children()[0]
+            // console.log($(this).children("div.flip-card-back"))
+            console.log(div_back)
+            $(div_front).addClass("in");
+            $(div_front).removeClass("out");
+
+            $(div_back).addClass("out");
+            $(div_back).removeClass("in");
+
+});
+
+</script>
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>    
+
+</body>
+</html>
