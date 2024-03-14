@@ -119,24 +119,24 @@ If you want to use a prompt and the class name together, pass the `--prompt` arg
 
 | Category     | Link |
 |:-------------|:----:|
-| Original     | [Link]()     |
-| Class Name   | [Link]()     |
-| BLiP Caption | [Link]()     |
-| Color        | [Link]()     |
-| Texture      | [Link]()     |
-| Adversarial  | [Link]()     |
+| Original     | [Link](https://drive.google.com/drive/folders/1Eqs9J18d-wqpIvq8KMulnsK1ROYF0Uv7?usp=sharing)     |
+| Class Name   | [Link](https://drive.google.com/drive/folders/1V593X8t9UQQYf5VQX8KLt_98EiVKHmAu?usp=sharing)     |
+| BLiP Caption | [Link](https://drive.google.com/drive/folders/1XbyrUS4NepU07rXoDBPSd7lmm266S3RB?usp=sharing)     |
+| Color        | [Link](https://drive.google.com/drive/folders/1KruMwkf-dZ0MFkgkj7Jctk_w1zs-z62W?usp=sharing)     |
+| Texture      | [Link](https://drive.google.com/drive/folders/19mp_b5Fl0GMojwtR3pN93DDq0V5s5QLh?usp=sharing)     |
+| Adversarial  | [Link](https://drive.google.com/drive/folders/1m_LbKfv_UJOzhvfFMWDStE9l53bQJ5HX?usp=sharing)     |
 
 </td>
 <td>
 
 | Category     | Link |
 |:-------------|:----:|
-| Original     | [Link]()     |
-| Class Name   | [Link]()     |
-| BLiP Caption |  [Link]()    |
-| Color        | [Link]()     |
-| Texture      | [Link]()     |
-| Adversarial  | [Link]()     |
+| Original     | [Link](https://drive.google.com/drive/folders/1XGzYzPSjFvf3CXdOj3sI9Jm2X7Z60S25?usp=sharing)     |
+| Class Name   | [Link](https://drive.google.com/drive/folders/1hC25T3z1vEa0cb08fRl5vtoWTUg8B592?usp=sharing)     |
+| BLiP Caption |  [Link](https://drive.google.com/drive/folders/13daLoIJQSzsocX1unwa4_dj3SMFb512i?usp=sharing)    |
+| Color        | [Link](https://drive.google.com/drive/folders/1s5gDNosZK36fLFs0dsQ0Nr78F0XPGC9R?usp=sharing)     |
+| Texture      | [Link](https://drive.google.com/drive/folders/1bgB-0OcJ8_deckKXCZwphnhry_UAXh6w?usp=sharing)     |
+| Adversarial  | [Link](https://drive.google.com/drive/folders/1m_LbKfv_UJOzhvfFMWDStE9l53bQJ5HX?usp=sharing)     |
 
 </td>
 
