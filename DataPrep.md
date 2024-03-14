@@ -72,6 +72,10 @@ python dataset_utils/generate_captions_blip.py --dataset imagenet --data_path <>
 A captions folder will be generated in the dataset folder.
 
 
+To Download the ImageNet-B dataset go to this link [here](https://drive.google.com/drive/folders/1YMvJvUGSs96CS2XH4CqAnslUqZyiwnyG?usp=sharing)
+
+To Download the ImageNet-B_1k dataset go to this link [here](https://drive.google.com/drive/folders/1NVF6ASPOxnM8cG_0CUJE4gPYp1QlZ5Tc?usp=sharing)
+
 To Download the COCO-DC dataset go to this link [here](https://drive.google.com/drive/folders/1p-ZXRXB4a92P0cUfZwGMu6L192as5BZZ?usp=sharing)
 
 To Download the COCO-DC(classification) dataset go to this link [here](https://drive.google.com/drive/folders/1yHAPUZ3qyxQM_TRrAdUGx3Vkvd9bWxF5?usp=sharing)
