@@ -6,9 +6,12 @@ from typing import Any, Callable, Dict, List, Optional, Union
 import PIL
 import numpy as np
 import torch
+from torch import optim
 from PIL import Image
 from diffusers import DDIMScheduler
 from diffusers.image_processor import VaeImageProcessor
+import torchvision.transforms.functional as TF
+import torch.nn.functional as F
 from torchvision import transforms
 
 from dataset_utils import imagenet_label
@@ -16,6 +19,7 @@ from dataset_utils.filtered_dataset import FilteredImageNetDataset, FilteredCOCO
 from dataset_utils.filtered_dataset_coco_classification import FilteredCocoClassification
 from distances import LpDistance
 from pipelines import StableDiffusionInpaintPipeline
+import eval_classification_models as classification_models
 from utils import get_generator, encode_vae_image, get_timesteps, check_inputs, prepare_mask_and_masked_image, prepare_latents
 from utils import view_images
 
@@ -25,8 +29,8 @@ def get_parser():
 
     parser.add_argument('--save_dir', default="output", type=str,
                         help='Where to save the adversarial examples, and other results')
-    parser.add_argument('--dataset', default="imagenet", type=str, choices=["imagenet", "coco", "coco_classification"])
-    parser.add_argument('--data_path', default="create_data/images", type=str,
+    parser.add_argument('--dataset', default="imagenet", type=str, choices=["imagenet", "coco_classification"])
+    parser.add_argument('--data_path', default="/l/users/muhammad.huzaifa/866/dataset/filtered_images_resized", type=str,
                         help='The clean images root directory')
     parser.add_argument('--images_per_class', default=10000000, type=int)
 
@@ -36,10 +40,12 @@ def get_parser():
                         type=str,
                         help='Change the path to `stabilityai/stable-diffusion-2-inpainting` if want to use the pretrained model')
     parser.add_argument('--res', default=512, type=int, help='Input image resized resolution')
-    parser.add_argument('--diffusion_steps', default=1, type=int, help='Total DDIM sampling steps')
+    parser.add_argument('--diffusion_steps', default=10, type=int, help='Total DDIM sampling steps')
+    parser.add_argument('--start_step', default=6, type=int, help='Which DDIM step to start the attack')
+    parser.add_argument('--attack_type', default="ensemble", type=str, choices=["text", "latent", "ensemble"])
     parser.add_argument('--guidance', default=7.5, type=float, help='guidance scale of diffusion models')
     parser.add_argument('--prompt', default="A picture of a XXX", type=str, help='prompt')
-    parser.add_argument('--background_change', default="class_name", type=str, choices=["class_name", "caption", "prompt"])
+    parser.add_argument('--background_change', default="caption", type=str, choices=["class_name", "caption", "prompt"])
 
     parser.add_argument('--apply_mask', default=True, type=lambda x: (str(x).lower() == 'true'),
                         help='Whether to leverage pseudo mask for better imperceptibility')
@@ -50,6 +56,7 @@ def get_parser():
     args = parser.parse_args()
 
     return args
+
 
 
 def get_destination_folder(img_path, save_dir, dataset
@@ -71,7 +78,6 @@ def get_destination_folder(img_path, save_dir, dataset
     os.makedirs(destination_folder, exist_ok=True)
 
     return destination_folder, image_name
-
 
 
 
@@ -153,7 +159,6 @@ def encode_prompt(
     Returns:
         torch.FloatTensor: Encoded embeddings for the prompt.
     """
-
     text_inputs, uncond_inputs = None, None
 
     if prompt_embeds is None:
@@ -185,7 +190,6 @@ def encode_prompt(
 
 
     bs_embed, seq_len, _ = prompt_embeds.shape
-
     # duplicate text embeddings for each generation per prompt, using mps friendly method
     prompt_embeds = prompt_embeds.repeat(1, num_images_per_prompt, 1)
     prompt_embeds = prompt_embeds.view(bs_embed * num_images_per_prompt, seq_len, -1)
@@ -211,7 +215,7 @@ def encode_prompt(
 
 
 
-@torch.no_grad()
+@torch.enable_grad()
 def inference(
         model,
         prompt: Union[str, List[str]] = None,
@@ -234,10 +238,17 @@ def inference(
         callback: Optional[Callable[[int, int, torch.FloatTensor], None]] = None,
         callback_steps: int = 1,
         cross_attention_kwargs: Optional[Dict[str, Any]] = None,
+        start_step: int = 7,
+        attack: str = "latent",
+        label = None,
         apply_mask: bool = False,
 ):
-
     device = model._execution_device
+    classifier = classification_models.resnet50_adv().to(device).eval()
+    classifier.requires_grad_(False)
+    model.text_encoder.requires_grad_(False)
+    model.vae.requires_grad_(False)
+    model.unet.requires_grad_(False)
 
     # 0. Default height and width to unet
     height = height or model.unet.config.sample_size * model.vae_scale_factor
@@ -293,7 +304,6 @@ def inference(
     3. set timesteps e.g if num_inference_steps = 20, if strength=1.0, then timesteps = 
     [951, 901, 851, 801, 751, 701, 651, 601, 551, 501, 451, 401, 351, 301, 251, 201, 151, 101,  51,   1]
     """
-
     scheduler.set_timesteps(num_inference_steps, device=device)
 
     timesteps, num_inference_steps = get_timesteps(scheduler,
@@ -310,11 +320,14 @@ def inference(
         image, mask_image, height, width, return_image=True
     )
 
-    resized_mask = mask.clone().detach().to(device=device)
-    resized_orig_image = init_image.clone().detach().to(device=device)
-    resized_masked_image = masked_image.clone().detach().to(device=device)
+    resized_mask = mask.clone().detach()
+    resized_orig_image = init_image.clone().detach()
+    resized_masked_image = masked_image.clone().detach()
 
-
+    resized_mask = resized_mask.to(device=device)
+    resized_orig_image = resized_orig_image.to(device=device)
+    resized_masked_image = resized_masked_image.to(device=device)
+    
     # 6. Prepare latent variables
     num_channels_latents = model.vae.config.latent_channels
     num_channels_unet = model.unet.config.in_channels
@@ -377,13 +390,138 @@ def inference(
             f"The unet {unet.__class__} should have either 4 or 9 input channels, not {unet.config.in_channels}."
         )
 
-    # 9. Prepare extra step kwargs
+    # 9. Prepare extra step kwargs. TODO: Logic should ideally just be moved out of the pipeline
     extra_step_kwargs = model.prepare_extra_step_kwargs(generator, eta)
 
     # 10. Denoising loop
-    num_warmup_steps = len(timesteps) - num_inference_steps * scheduler.order
-    with model.progress_bar(total=num_inference_steps) as progress_bar:
-        for i, t in enumerate(timesteps):
+    num_warmup_steps = len(timesteps) - num_inference_steps * scheduler.order   
+    
+    for i, t in enumerate(timesteps[0:start_step-1]):
+        # expand the latents if we are doing classifier free guidance
+        latent_model_input = torch.cat([latents] * 2) if do_classifier_free_guidance else latents
+
+        # concat latents, mask, masked_image_latents in the channel dimension
+        latent_model_input = scheduler.scale_model_input(latent_model_input, t)
+
+        if num_channels_unet == 9:
+            latent_model_input = torch.cat([latent_model_input, mask, masked_image_latents], dim=1)
+
+        # predict the noise residual
+        noise_pred = unet(
+            latent_model_input,
+            t,
+            encoder_hidden_states=prompt_embeds,
+            cross_attention_kwargs=cross_attention_kwargs,
+            return_dict=False,
+        )[0]
+
+        # perform guidance
+        if do_classifier_free_guidance:
+            noise_pred_uncond, noise_pred_text = noise_pred.chunk(2)
+            noise_pred = noise_pred_uncond + guidance_scale * (noise_pred_text - noise_pred_uncond)
+
+        # compute the previous noisy sample x_t -> x_t-1
+        latents = scheduler.step(noise_pred, t, latents, **extra_step_kwargs, return_dict=False)[0]
+    
+    
+    latent = latents 
+    if attack == "ensemble":
+        latent.requires_grad_(True)
+        prompt_embe = prompt_embeds[1].clone().detach().requires_grad_(True)  
+        optimizer = optim.AdamW([prompt_embe,latent], lr=10e-2)
+    elif attack == "latent":
+        latent.requires_grad_(True)
+        optimizer = optim.AdamW([latent], lr=10e-2)
+    elif attack == "text":
+        prompt_embe = prompt_embeds[1].clone().detach().requires_grad_(True)   
+        optimizer = optim.AdamW([prompt_embe], lr=10e-2) 
+
+    cross_entro = torch.nn.CrossEntropyLoss()
+    
+    for _, _ in enumerate(range(20)): 
+        latents = latent 
+        if attack != "latent":
+            prompt_embeds = torch.cat([prompt_embeds[0].unsqueeze(0),prompt_embe.unsqueeze(0)])      
+        for i, t in enumerate(timesteps[start_step-1:]):
+        
+            # expand the latents if we are doing classifier free guidance
+            latent_model_input = torch.cat([latents] * 2) if do_classifier_free_guidance else latents
+
+            # concat latents, mask, masked_image_latents in the channel dimension
+            latent_model_input = scheduler.scale_model_input(latent_model_input, t)
+
+            if num_channels_unet == 9:
+                latent_model_input = torch.cat([latent_model_input, mask, masked_image_latents], dim=1)
+
+            # predict the noise residual
+            noise_pred = unet(
+                latent_model_input,
+                t,
+                encoder_hidden_states=prompt_embeds,
+                cross_attention_kwargs=cross_attention_kwargs,
+                return_dict=False,
+            )[0]
+
+            # perform guidance
+            if do_classifier_free_guidance:
+                noise_pred_uncond, noise_pred_text = noise_pred.chunk(2)
+                noise_pred = noise_pred_uncond + guidance_scale * (noise_pred_text - noise_pred_uncond)
+
+            # compute the previous noisy sample x_t -> x_t-1
+            latents = scheduler.step(noise_pred, t, latents, **extra_step_kwargs, return_dict=False)[0]    
+        
+        
+        if num_channels_unet == 4:
+            init_latents_proper = image_latents[:1]
+            init_mask = mask[:1]
+
+            if i < len(timesteps) - 1:
+                noise_timestep = timesteps[i + 1]
+                init_latents_proper = scheduler.add_noise(
+                    init_latents_proper, noise, torch.tensor([noise_timestep])
+                )
+
+            latents = (1 - init_mask) * init_latents_proper + init_mask * latents
+
+        # call the callback, if provided
+        if i == len(timesteps) - 1 or ((i + 1) > num_warmup_steps and (i + 1) % model.scheduler.order == 0):
+            if callback is not None and i % callback_steps == 0:
+                callback(i, t, latents)
+
+        if not output_type == "latent":
+            image = vae.decode(latents / vae.config.scaling_factor, return_dict=False)[0]
+            if apply_mask:
+                image = (image.squeeze(0) * (resized_mask.squeeze(0)) + (1 - resized_mask.squeeze(0)) * resized_orig_image.squeeze(0)).unsqueeze(0)
+            
+            image, has_nsfw_concept = image, None  #
+            # self.run_safety_checker(image, device, prompt_embeds.dtype)
+            print("Not running safety checker")
+        else:
+            image = latents
+            has_nsfw_concept = None
+
+        if has_nsfw_concept is None:
+            do_denormalize = [True] * image.shape[0]
+        else:
+            do_denormalize = [not has_nsfw for has_nsfw in has_nsfw_concept]
+
+        out_image = (image / 2 + 0.5).clamp(0, 1).squeeze(0)
+        
+        out_image = TF.resize(out_image, 256)
+        out_image = TF.center_crop(out_image, 224)
+            
+        pred = classifier(out_image.unsqueeze(0).to(device))
+        loss = - cross_entro(pred, label) * 100
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+            
+    with torch.no_grad():
+        latents = latent
+        if attack != "latent":
+            prompt_embeds = torch.cat([prompt_embeds[0].unsqueeze(0),prompt_embe.unsqueeze(0)])     
+        for i, t in enumerate(timesteps[start_step-1:]):
             # expand the latents if we are doing classifier free guidance
             latent_model_input = torch.cat([latents] * 2) if do_classifier_free_guidance else latents
 
@@ -409,7 +547,7 @@ def inference(
 
             # compute the previous noisy sample x_t -> x_t-1
             latents = scheduler.step(noise_pred, t, latents, **extra_step_kwargs, return_dict=False)[0]
-
+            
             if num_channels_unet == 4:
                 init_latents_proper = image_latents[:1]
                 init_mask = mask[:1]
@@ -424,15 +562,14 @@ def inference(
 
             # call the callback, if provided
             if i == len(timesteps) - 1 or ((i + 1) > num_warmup_steps and (i + 1) % model.scheduler.order == 0):
-                progress_bar.update()
                 if callback is not None and i % callback_steps == 0:
                     callback(i, t, latents)
 
     if not output_type == "latent":
         image = vae.decode(latents / vae.config.scaling_factor, return_dict=False)[0]
         if apply_mask:
-            image = (image.squeeze(0) * (resized_mask.squeeze(0)) + (
-                        1 - resized_mask.squeeze(0)) * resized_orig_image.squeeze(0)).unsqueeze(0)
+                image = (image.squeeze(0) * (resized_mask.squeeze(0)) + (1 - resized_mask.squeeze(0)) * resized_orig_image.squeeze(0)).unsqueeze(0)
+            
         image, has_nsfw_concept = image, None  #
         # self.run_safety_checker(image, device, prompt_embeds.dtype)
         print("Not running safety checker")
@@ -444,15 +581,15 @@ def inference(
         do_denormalize = [True] * image.shape[0]
     else:
         do_denormalize = [not has_nsfw for has_nsfw in has_nsfw_concept]
-
+            
     image = model.image_processor.postprocess(image, output_type=output_type, do_denormalize=do_denormalize)
     resized_mask = model.image_processor.postprocess(resized_mask, output_type=output_type,
-                                                     do_denormalize=[False] * resized_mask.shape[0])
+                                                    do_denormalize=[False] * resized_mask.shape[0])
     resized_masked_image = model.image_processor.postprocess(resized_masked_image, output_type=output_type,
-                                                             do_denormalize=do_denormalize)
+                                                            do_denormalize=do_denormalize)
     resized_orig_image = model.image_processor.postprocess(resized_orig_image, output_type=output_type,
-                                                           do_denormalize=do_denormalize)
-
+                                                        do_denormalize=do_denormalize)    
+            
     # Offload last model to CPU
     if hasattr(model, "final_offload_hook") and model.final_offload_hook is not None:
         model.final_offload_hook.offload()
@@ -464,8 +601,6 @@ def inference(
 
 
 if __name__ == "__main__":
-
-
 
     args = get_parser()
 
@@ -501,6 +636,7 @@ if __name__ == "__main__":
     inpaint_images = []
     images = []
 
+
     transform = transforms.Compose([
         transforms.Resize((512, 512)),
         transforms.ToTensor()
@@ -522,10 +658,9 @@ if __name__ == "__main__":
     elif args.dataset == "coco_classification":
         dataset = FilteredCocoClassification(args.data_path, transform=transform, transform_mask=transform_mask, split="val",
                                               images_per_class=args.images_per_class, expansion_mask_pixels=args.expand_mask_pixels)
-
-
+    
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=False)
-
+    
     L1 = LpDistance(1)
     L2 = LpDistance(2)
     Linf = LpDistance(float("inf"))
@@ -572,6 +707,7 @@ if __name__ == "__main__":
         inpaint_image, resized_mask,  resized_masked_image, resized_orig_image = inference(model=ldm_stable, prompt=prompt, image=tmp_image, mask_image=mask_img, generator=get_generator(8888),
                            strength=1.0, num_inference_steps=diffusion_steps,
                            guidance_scale=guidance, num_images_per_prompt=1,
+                           label = img_label, start_step=args.start_step, attack = args.attack_type,
                             output_type="np", apply_mask=apply_mask)
 
         resized_masked_image[resized_masked_image == 0.5] = 0
@@ -593,6 +729,7 @@ if __name__ == "__main__":
                             save_path=args.save_dir + f"/images{ind}_{i}.png",
                             num_rows=2)
 
+
         destination_folder, image_name = get_destination_folder(img_path[0], save_dir, args.dataset)
         print("Destination Folder: ", destination_folder)
         os.makedirs(destination_folder, exist_ok=True)
@@ -609,5 +746,6 @@ if __name__ == "__main__":
         os.makedirs(dest_ann_folder, exist_ok=True)
         dest_ann_file = os.path.join(dest_ann_folder, "instances_val2017.json")
         shutil.copyfile(source_ann_file, dest_ann_file)
+
 
 

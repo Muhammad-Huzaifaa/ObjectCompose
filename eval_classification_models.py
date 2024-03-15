@@ -69,6 +69,15 @@ def resnet50():
     model.eval()
     return model
 
+def resnet50_adv():
+    model = create_model('resnet50', pretrained=True)
+    mean, std = model.default_cfg['mean'], model.default_cfg['std']
+    print(f"mean: {mean}, std: {std}")
+    model = torch.nn.Sequential(Normalize(ms=[mean, std]), model)
+    model = model
+    model.eval()
+    return model
+
 
 def vit_tiny_patch16_224():
     model = create_model('vit_tiny_patch16_224', pretrained=True)
