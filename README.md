@@ -183,7 +183,7 @@ If you want to use a prompt and the class name together, pass the `--prompt` arg
 
 **1. [ImageNet-E](https://arxiv.org/abs/2303.17096)**
 
-| ImageNet-E                     |      Link       |
+| Category                    |      Link       |
 |:----------------------------|:---------------:|
 | Original                    |    [Link]()     | 
 | ImageNet-E ($`λ=-20`$)      |    [Link]()     |
@@ -195,7 +195,7 @@ If you want to use a prompt and the class name together, pass the `--prompt` arg
 
 **2. [LANCE](https://arxiv.org/abs/2305.19164)**
 
-| LANCE                       |   Link   |
+| Category                       |   Link   |
 |:----------------------------|:--------:|
 | Original                    | [Link]() | 
 | LANCE                       | [Link]() |
