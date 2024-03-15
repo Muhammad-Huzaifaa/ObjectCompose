@@ -511,7 +511,11 @@ def inference(
         out_image = TF.center_crop(out_image, 224)
             
         pred = classifier(out_image.unsqueeze(0).to(device))
-        loss = - cross_entro(pred, label) * 100
+        if args.dataset == "coco":
+            clean_pred = classifier(image.to(device))
+            loss = - F.mse_loss(clean_pred, pred)
+        else:
+            loss = - cross_entro(pred, label) * 100
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
