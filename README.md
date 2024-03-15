@@ -181,7 +181,7 @@ If you want to use a prompt and the class name together, pass the `--prompt` arg
 <tr valign="top">
 <td>
 
-**1. [ImageNet-E](https://arxiv.org/abs/2303.17096)**
+**1. [ImageNet-E (CVPR-2023)](https://arxiv.org/abs/2303.17096)**
 
 | Category                    |      Link       |
 |:----------------------------|:---------------:|
@@ -193,7 +193,7 @@ If you want to use a prompt and the class name together, pass the `--prompt` arg
 </td>
 <td>
 
-**2. [LANCE](https://arxiv.org/abs/2305.19164)**
+**2. [LANCE (NeurIPS-2023)](https://arxiv.org/abs/2305.19164)**
 
 | Category                       |   Link   |
 |:----------------------------|:--------:|
