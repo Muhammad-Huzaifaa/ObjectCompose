@@ -1,4 +1,4 @@
-# **ObjectCompose: Evaluating Resilience of Vision-Based Models on Object-to-Background Compositional Changes**
+# **ObjectCompose: Evaluating Resilience of Vision-Based Models on Object-to-Background Compositional Changes [ACCV 2024]**
 
 [Hashmat Shadab Malik*](https://github.com/HashmatShadab), 
 [ Muhammad Huzaifa*](https://github.com/Muhammad-Huzaifaa),
