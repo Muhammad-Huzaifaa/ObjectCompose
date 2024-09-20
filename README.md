@@ -8,7 +8,6 @@ and [Fahad Shahbaz Khan](https://scholar.google.es/citations?user=zvaeYnUAAAAJ&h
 
 [![paper](https://img.shields.io/badge/arXiv-Paper-<COLOR>.svg)](https://arxiv.org/abs/2403.04701)
 [![Website](https://img.shields.io/badge/Project-Website-87CEEB)](https://muhammad-huzaifaa.github.io/ObjectCompose/)
-[![slides](https://img.shields.io/badge/Presentation-Slides-B762C1)](https://drive.google.com/file/d/1QtKMByp8nZDU-SwzFm-KzLm5Z1oXizXw/view?usp=sharing)
 
 [//]: # ([![Video]&#40;https://img.shields.io/badge/Video-Presentation-F9D371&#41;]&#40;https://drive.google.com/file/d/1ECkp_lbMj5Pz7RX_GgEvWWDHf5PUXlFd/view?usp=share_link&#41;)
 
