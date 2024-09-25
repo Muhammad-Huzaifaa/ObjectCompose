@@ -1,4 +1,4 @@
-# **ObjectCompose: Evaluating Resilience of Vision-Based Models on Object-to-Background Compositional Changes [ACCV 2024]**
+# **ObjectCompose: Evaluating Resilience of Vision-Based Models on Object-to-Background Compositional Changes [ACCV 2024 Oral]**
 
 [Hashmat Shadab Malik*](https://github.com/HashmatShadab), 
 [ Muhammad Huzaifa*](https://github.com/Muhammad-Huzaifaa),
@@ -17,6 +17,8 @@ and [Fahad Shahbaz Khan](https://scholar.google.es/citations?user=zvaeYnUAAAAJ&h
 <hr />
 
 # :rocket: News
+* **(September 25, 2024)**
+  * Paper selected for Oral presentation at ACCV 2024!🎊
 * **(September 20, 2024)**
   * Paper accepted at ACCV 2024!🎊
 * **(March 15, 2024)**
