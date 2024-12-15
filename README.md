@@ -1,5 +1,7 @@
 # **ObjectCompose: Evaluating Resilience of Vision-Based Models on Object-to-Background Compositional Changes [ACCV 2024 Oral]**
 
+# **Best Student Paper - Runner up**
+
 [Hashmat Shadab Malik*](https://github.com/HashmatShadab), 
 [ Muhammad Huzaifa*](https://github.com/Muhammad-Huzaifaa),
 [Muzammal Naseer](https://scholar.google.ch/citations?user=tM9xKA8AAAAJ&hl=en),
